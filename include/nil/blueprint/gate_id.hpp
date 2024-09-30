@@ -243,7 +243,7 @@ namespace nil {
                 return (value_1 < other.value_1) || ((value_1 == other.value_1) && (value_2 < other.value_2));
             }
 
-            const std::size_t get_selector() {
+            std::size_t get_selector() const {
                 return selector_index;
             }
 
@@ -346,7 +346,7 @@ namespace nil {
                 return (value_1 < other.value_1) || ((value_1 == other.value_1) && (value_2 < other.value_2));
             }
 
-            const std::size_t get_selector() {
+            std::size_t get_selector() const {
                 return tag_index;
             }
 

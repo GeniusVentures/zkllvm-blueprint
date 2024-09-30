@@ -32,7 +32,7 @@ namespace nil {
             namespace detail {
                 // Implementing [https://arxiv.org/pdf/1907.04505.pdf]
                 // 11/9 approximation ratio
-                std::unordered_map<std::size_t, std::size_t> huang_lu(
+                inline std::unordered_map<std::size_t, std::size_t> huang_lu(
                         std::list<std::pair<std::size_t, std::size_t>> &sizes,
                         std::size_t agent_amount) {
                     sizes.sort(

@@ -58,8 +58,10 @@ namespace nil {
                 OPTIONAL,
             } t;
 
-            manifest_lookup_type(type t_) : t(t_) {}
-            manifest_lookup_type() : t(type::NONE) {}
+            manifest_lookup_type(type t_) : t(t_) {
+            }
+            manifest_lookup_type() : t(type::NONE) {
+            }
 
             bool operator==(manifest_lookup_type lt) const {
                 return t == lt.t;
@@ -74,8 +76,7 @@ namespace nil {
             }
 
             manifest_lookup_type intersect(manifest_lookup_type lt) const {
-                if (t == manifest_lookup_type::type::UNSAT ||
-                    lt == manifest_lookup_type::type::UNSAT) {
+                if (t == manifest_lookup_type::type::UNSAT || lt == manifest_lookup_type::type::UNSAT) {
 
                     return manifest_lookup_type::type::UNSAT;
                 } else if (t == manifest_lookup_type::type::REQUIRED) {
@@ -90,8 +91,7 @@ namespace nil {
                     } else {
                         return manifest_lookup_type::type::REQUIRED;
                     }
-                } else if (t == manifest_lookup_type::type::NONE ||
-                           lt == manifest_lookup_type::type::NONE) {
+                } else if (t == manifest_lookup_type::type::NONE || lt == manifest_lookup_type::type::NONE) {
                     return manifest_lookup_type::type::NONE;
                 } else if (t == manifest_lookup_type::type::OPTIONAL) {
                     return lt;
@@ -100,12 +100,10 @@ namespace nil {
             }
 
             manifest_lookup_type merge_with(manifest_lookup_type lt) const {
-                if (t == manifest_lookup_type::type::UNSAT ||
-                    lt == manifest_lookup_type::type::UNSAT) {
+                if (t == manifest_lookup_type::type::UNSAT || lt == manifest_lookup_type::type::UNSAT) {
 
                     return manifest_lookup_type::type::UNSAT;
-                } else if (t == manifest_lookup_type::type::REQUIRED ||
-                           lt == manifest_lookup_type::type::REQUIRED) {
+                } else if (t == manifest_lookup_type::type::REQUIRED || lt == manifest_lookup_type::type::REQUIRED) {
                     return manifest_lookup_type::type::REQUIRED;
                 } else if (t == manifest_lookup_type::type::NONE) {
                     return lt;
@@ -116,7 +114,7 @@ namespace nil {
             }
         };
 
-        std::ostream& operator<<(std::ostream &os, const manifest_lookup_type& t) {
+        inline std::ostream &operator<<(std::ostream &os, const manifest_lookup_type &t) {
             switch (t.t) {
                 case manifest_lookup_type::type::NONE:
                     os << "NONE";
@@ -141,9 +139,12 @@ namespace nil {
                 REQUIRED,
             } t;
 
-            manifest_constant_type(type t_) : t(t_) {}
-            manifest_constant_type() : t(type::NONE) {}
-            manifest_constant_type(bool b) : t(b ? type::REQUIRED : type::NONE) {}
+            manifest_constant_type(type t_) : t(t_) {
+            }
+            manifest_constant_type() : t(type::NONE) {
+            }
+            manifest_constant_type(bool b) : t(b ? type::REQUIRED : type::NONE) {
+            }
 
             bool operator==(manifest_constant_type lt) const {
                 return t == lt.t;
@@ -160,8 +161,7 @@ namespace nil {
             manifest_constant_type intersect(const compiler_manifest &manifest) const;
 
             manifest_constant_type merge_with(manifest_constant_type lt) const {
-                if (t == manifest_constant_type::type::UNSAT ||
-                    lt == manifest_constant_type::type::UNSAT) {
+                if (t == manifest_constant_type::type::UNSAT || lt == manifest_constant_type::type::UNSAT) {
 
                     return manifest_constant_type::type::UNSAT;
                 } else if (t == manifest_constant_type::type::REQUIRED ||
@@ -172,7 +172,7 @@ namespace nil {
             }
         };
 
-        std::ostream& operator<<(std::ostream &os, const manifest_constant_type& t) {
+        inline std::ostream &operator<<(std::ostream &os, const manifest_constant_type &t) {
             switch (t.t) {
                 case manifest_constant_type::type::NONE:
                     os << "NONE";
@@ -201,7 +201,7 @@ namespace nil {
             virtual std::shared_ptr<manifest_param> merge_with(std::shared_ptr<manifest_param> other) = 0;
             virtual ~manifest_param() = default;
 
-            virtual std::ostream& operator<<(std::ostream &os) const = 0;
+            virtual std::ostream &operator<<(std::ostream &os) const = 0;
 
             virtual manifest_param_iterator begin() const = 0;
             virtual manifest_param_iterator end() const = 0;
@@ -209,15 +209,10 @@ namespace nil {
             // Valid only if is_satisfiable() == true
             virtual std::uint32_t max_value_if_sat() const = 0;
 
-            enum class type {
-                UNSAT,
-                SINGLE_VALUE,
-                RANGE,
-                SET
-            };
+            enum class type { UNSAT, SINGLE_VALUE, RANGE, SET };
         };
 
-        std::ostream& operator<<(std::ostream &os, const manifest_param& p) {
+        inline std::ostream &operator<<(std::ostream &os, const manifest_param &p) {
             return p.operator<<(os);
         }
 
@@ -231,13 +226,14 @@ namespace nil {
             using iterator_category = std::forward_iterator_tag;
             using value_type = std::uint32_t;
             using difference_type = std::ptrdiff_t;
-            using pointer = std::uint32_t*;
-            using reference = std::uint32_t&;
+            using pointer = std::uint32_t *;
+            using reference = std::uint32_t &;
 
-            const manifest_param* obj;
+            const manifest_param *obj;
             it_type value;
 
-            manifest_param_iterator(const manifest_param* param, it_type value_) : obj(param), value(value_) {}
+            manifest_param_iterator(const manifest_param *param, it_type value_) : obj(param), value(value_) {
+            }
 
             value_type operator*() const {
                 if (value.type() == typeid(std::uint32_t)) {
@@ -247,7 +243,7 @@ namespace nil {
                 }
             }
 
-            manifest_param_iterator& operator++() {
+            manifest_param_iterator &operator++() {
                 value = obj->next(value);
                 return *this;
             }
@@ -258,11 +254,11 @@ namespace nil {
                 return tmp;
             }
 
-            bool operator!=(const manifest_param_iterator& other) const {
+            bool operator!=(const manifest_param_iterator &other) const {
                 return value != other.value || obj != other.obj;
             }
 
-            bool operator==(const manifest_param_iterator& other) const {
+            bool operator==(const manifest_param_iterator &other) const {
                 return value == other.value && obj == other.obj;
             }
         };
@@ -296,7 +292,7 @@ namespace nil {
                 return std::shared_ptr<manifest_param>(new manifest_unsat_param());
             }
 
-            std::ostream& operator<<(std::ostream &os) const override {
+            std::ostream &operator<<(std::ostream &os) const override {
                 os << "UNSAT";
                 return os;
             }
@@ -317,7 +313,7 @@ namespace nil {
                 return 0;
             }
 
-            bool operator==(const manifest_unsat_param& other) const {
+            bool operator==(const manifest_unsat_param &other) const {
                 return true;
             }
         };
@@ -328,7 +324,8 @@ namespace nil {
 
             std::uint32_t value;
 
-            manifest_single_value_param(std::uint32_t value) : value(value) {}
+            manifest_single_value_param(std::uint32_t value) : value(value) {
+            }
 
             bool check_manifest_param(std::uint32_t value, bool strict = true) override {
                 if (strict) {
@@ -360,7 +357,7 @@ namespace nil {
 
             std::shared_ptr<manifest_param> merge_with(std::shared_ptr<manifest_param> other) override;
 
-            std::ostream& operator<<(std::ostream &os) const override {
+            std::ostream &operator<<(std::ostream &os) const override {
                 os << "VALUE(" << value << ")";
                 return os;
             }
@@ -381,7 +378,7 @@ namespace nil {
                 return value;
             }
 
-            bool operator==(const manifest_single_value_param& other) const {
+            bool operator==(const manifest_single_value_param &other) const {
                 return value == other.value;
             }
         };
@@ -396,8 +393,9 @@ namespace nil {
 
             // please do not make finish too large
             // save the optimizers
-            manifest_range_param(std::int32_t start, std::int32_t finish_, std::uint32_t step = 1)
-                : start(start), finish(finish_), step(step) {}
+            manifest_range_param(std::int32_t start, std::int32_t finish_, std::uint32_t step = 1) :
+                start(start), finish(finish_), step(step) {
+            }
 
             bool is_satisfiable() override {
                 return start < finish && std::abs(start - finish) >= int(start % step);
@@ -416,7 +414,7 @@ namespace nil {
             std::shared_ptr<manifest_param> subtract(std::set<std::uint32_t> values) override;
             std::shared_ptr<manifest_param> merge_with(std::shared_ptr<manifest_param> other) override;
 
-            std::ostream& operator<<(std::ostream &os) const override {
+            std::ostream &operator<<(std::ostream &os) const override {
                 os << "RANGE(" << start << ", " << finish << ", " << step << ")";
                 return os;
             }
@@ -439,7 +437,7 @@ namespace nil {
             }
 
             // Isn't strict equality: some ranges are isomorphic, and we don't check that.
-            bool operator==(const manifest_range_param& other) const {
+            bool operator==(const manifest_range_param &other) const {
                 return start == other.start && finish == other.finish && step == other.step;
             }
         };
@@ -450,7 +448,8 @@ namespace nil {
 
             std::set<std::uint32_t> set;
 
-            manifest_set_param(std::set<std::uint32_t> set_) : set(std::move(set_)) {}
+            manifest_set_param(std::set<std::uint32_t> set_) : set(std::move(set_)) {
+            }
 
             void add_value(std::uint32_t value) {
                 set.insert(value);
@@ -482,7 +481,7 @@ namespace nil {
 
             std::shared_ptr<manifest_param> merge_with(std::shared_ptr<manifest_param> other) override;
 
-            std::ostream& operator<<(std::ostream &os) const override {
+            std::ostream &operator<<(std::ostream &os) const override {
                 os << "SET(";
                 for (auto it = set.begin(); it != set.end(); ++it) {
                     os << *it;
@@ -511,20 +510,20 @@ namespace nil {
                 return *set.rbegin();
             }
 
-            bool operator==(const manifest_set_param& other) const {
+            bool operator==(const manifest_set_param &other) const {
                 return set == other.set;
             }
         };
 
-        manifest_param::type get_manifest_param_type(manifest_param* a) {
+        inline manifest_param::type get_manifest_param_type(manifest_param *a) {
             using type = manifest_param::type;
-             if (dynamic_cast<manifest_unsat_param*>(a)) {
+            if (dynamic_cast<manifest_unsat_param *>(a)) {
                 return type::UNSAT;
-            } else if (dynamic_cast<manifest_single_value_param*>(a)) {
+            } else if (dynamic_cast<manifest_single_value_param *>(a)) {
                 return type::SINGLE_VALUE;
-            } else if (dynamic_cast<manifest_range_param*>(a)) {
+            } else if (dynamic_cast<manifest_range_param *>(a)) {
                 return type::RANGE;
-            } else if (dynamic_cast<manifest_set_param*>(a)) {
+            } else if (dynamic_cast<manifest_set_param *>(a)) {
                 return type::SET;
             } else {
                 BOOST_ASSERT_MSG(false, "Unknown manifest param type");
@@ -532,26 +531,26 @@ namespace nil {
             }
         }
 
-        manifest_param::type get_manifest_param_type(std::shared_ptr<manifest_param> a) {
+        inline manifest_param::type get_manifest_param_type(std::shared_ptr<manifest_param> a) {
             return get_manifest_param_type(a.get());
         }
 
-        std::shared_ptr<manifest_param> manifest_single_value_param::merge_with(
-                                std::shared_ptr<manifest_param> other) {
+        inline std::shared_ptr<manifest_param>
+            manifest_single_value_param::merge_with(std::shared_ptr<manifest_param> other) {
             using type = manifest_param::type;
             type other_type = get_manifest_param_type(other);
             if (other_type == type::UNSAT) {
                 return std::shared_ptr<manifest_param>(new manifest_unsat_param());
             } else if (other_type == type::SINGLE_VALUE) {
-                auto other_value = dynamic_cast<manifest_single_value_param*>(other.get())->value;
+                auto other_value = dynamic_cast<manifest_single_value_param *>(other.get())->value;
                 if (other_value == this->value) {
                     return std::shared_ptr<manifest_param>(new manifest_single_value_param(this->value));
                 } else {
-                    return std::shared_ptr<manifest_param>(new manifest_single_value_param(
-                        std::max(this->value, other_value)));
+                    return std::shared_ptr<manifest_param>(
+                        new manifest_single_value_param(std::max(this->value, other_value)));
                 }
             } else if (other_type == type::SET) {
-                const std::set<std::uint32_t> &other_set = dynamic_cast<manifest_set_param*>(other.get())->set;
+                const std::set<std::uint32_t> &other_set = dynamic_cast<manifest_set_param *>(other.get())->set;
                 std::set<std::uint32_t> new_set;
                 for (auto it = other_set.lower_bound(this->value); it != other_set.end(); it++) {
                     new_set.insert(*it);
@@ -560,14 +559,14 @@ namespace nil {
                     new_set.insert(this->value);
                 }
                 return std::shared_ptr<manifest_param>(new manifest_set_param(new_set));
-            } if (other_type == type::RANGE) {
-                auto range = dynamic_cast<manifest_range_param*>(other.get());
+            }
+            if (other_type == type::RANGE) {
+                auto range = dynamic_cast<manifest_range_param *>(other.get());
                 std::uint32_t new_start = std::max<std::int32_t>(
-                    this->value + (range->step - (this->value % range->step)) % range->step,
-                    range->start);
+                    this->value + (range->step - (this->value % range->step)) % range->step, range->start);
                 if (new_start < std::uint32_t(range->finish)) {
                     return std::shared_ptr<manifest_param>(
-                            new manifest_range_param(new_start, range->finish, range->step));
+                        new manifest_range_param(new_start, range->finish, range->step));
                 } else {
                     return std::shared_ptr<manifest_param>(new manifest_single_value_param(this->value));
                 }
@@ -575,13 +574,13 @@ namespace nil {
             return std::shared_ptr<manifest_param>(new manifest_unsat_param());
         }
 
-        std::shared_ptr<manifest_param> manifest_set_param::merge_with(std::shared_ptr<manifest_param> other) {
+        inline std::shared_ptr<manifest_param> manifest_set_param::merge_with(std::shared_ptr<manifest_param> other) {
             using type = manifest_param::type;
             type other_type = get_manifest_param_type(other);
             if (other_type == type::UNSAT) {
                 return std::shared_ptr<manifest_param>(new manifest_unsat_param());
             } else if (other_type == type::SINGLE_VALUE) {
-                auto other_value = dynamic_cast<manifest_single_value_param*>(other.get())->value;
+                auto other_value = dynamic_cast<manifest_single_value_param *>(other.get())->value;
                 std::set<std::uint32_t> new_set;
                 for (auto it = set.lower_bound(other_value); it != set.end(); it++) {
                     new_set.insert(*it);
@@ -591,12 +590,11 @@ namespace nil {
                 }
                 return std::shared_ptr<manifest_param>(new manifest_set_param(new_set));
             } else if (other_type == type::SET) {
-                auto other_set = dynamic_cast<manifest_set_param*>(other.get())->set;
+                auto other_set = dynamic_cast<manifest_set_param *>(other.get())->set;
                 if (other_set.empty() || set.empty()) {
                     return std::shared_ptr<manifest_param>(new manifest_unsat_param());
                 }
-                std::uint32_t min_1 = *set.begin(),
-                              min_2 = *other_set.begin();
+                std::uint32_t min_1 = *set.begin(), min_2 = *other_set.begin();
                 std::uint32_t max_min = std::max(min_1, min_2);
                 std::set<std::uint32_t> new_set;
                 for (auto it = set.lower_bound(max_min); it != set.end(); it++) {
@@ -610,17 +608,17 @@ namespace nil {
                 } else {
                     return std::shared_ptr<manifest_param>(new manifest_set_param(new_set));
                 }
-            } if (other_type == type::RANGE) {
-                auto range = dynamic_cast<manifest_range_param*>(other.get());
-                std::uint32_t new_start = std::max<std::int32_t>(
-                    *set.lower_bound(range->start),
-                    range->start);
+            }
+            if (other_type == type::RANGE) {
+                auto range = dynamic_cast<manifest_range_param *>(other.get());
+                std::uint32_t new_start = std::max<std::int32_t>(*set.lower_bound(range->start), range->start);
                 std::set<std::uint32_t> new_set = {new_start};
                 for (auto it = set.lower_bound(new_start); it != set.end(); it++) {
                     new_set.insert(*it);
                 }
                 std::uint32_t step = range->step;
-                for (auto it = new_start + (step - new_start % step) % step; std::int32_t(it) < range->finish; it += step) {
+                for (auto it = new_start + (step - new_start % step) % step; std::int32_t(it) < range->finish;
+                     it += step) {
                     new_set.insert(it);
                 }
                 if (new_set.empty()) {
@@ -632,29 +630,25 @@ namespace nil {
             return std::shared_ptr<manifest_param>(new manifest_unsat_param());
         }
 
-        std::shared_ptr<manifest_param> manifest_range_param::merge_with(std::shared_ptr<manifest_param> other) {
+        inline std::shared_ptr<manifest_param> manifest_range_param::merge_with(std::shared_ptr<manifest_param> other) {
             using type = manifest_param::type;
             type other_type = get_manifest_param_type(other);
             if (other_type == type::UNSAT) {
                 return std::shared_ptr<manifest_param>(new manifest_unsat_param());
             } else if (other_type == type::SINGLE_VALUE) {
-                std::uint32_t other_value = dynamic_cast<manifest_single_value_param*>(other.get())->value;
-                std::uint32_t new_start = std::max<std::int32_t>(
-                    other_value + (step - (other_value % step)) % step,
-                    start);
+                std::uint32_t other_value = dynamic_cast<manifest_single_value_param *>(other.get())->value;
+                std::uint32_t new_start =
+                    std::max<std::int32_t>(other_value + (step - (other_value % step)) % step, start);
                 if (new_start < std::uint32_t(finish)) {
-                    return std::shared_ptr<manifest_param>(
-                            new manifest_range_param(new_start, finish, step));
+                    return std::shared_ptr<manifest_param>(new manifest_range_param(new_start, finish, step));
                 } else {
                     return std::shared_ptr<manifest_param>(new manifest_single_value_param(other_value));
                 }
             } else if (other_type == type::SET) {
-                auto other_set = dynamic_cast<manifest_set_param*>(other.get());
-                std::uint32_t new_start = std::max<std::int32_t>(
-                    *other_set->set.lower_bound(start),
-                    start);
+                auto other_set = dynamic_cast<manifest_set_param *>(other.get());
+                std::uint32_t new_start = std::max<std::int32_t>(*other_set->set.lower_bound(start), start);
                 std::set<std::uint32_t> new_set = {new_start};
-                for (auto it = other_set->set.lower_bound(new_start); it !=  other_set->set.end(); it++) {
+                for (auto it = other_set->set.lower_bound(new_start); it != other_set->set.end(); it++) {
                     new_set.insert(*it);
                 }
                 for (auto it = new_start + (step - new_start % step) % step; it < std::uint32_t(finish); it += step) {
@@ -665,25 +659,24 @@ namespace nil {
                 } else {
                     return std::shared_ptr<manifest_param>(new manifest_set_param(new_set));
                 }
-            } if (other_type == type::RANGE) {
-                auto other_range = dynamic_cast<manifest_range_param*>(other.get());
-                std::int32_t new_start = std::max<std::int32_t>(
-                    start,
-                    other_range->start);
+            }
+            if (other_type == type::RANGE) {
+                auto other_range = dynamic_cast<manifest_range_param *>(other.get());
+                std::int32_t new_start = std::max<std::int32_t>(start, other_range->start);
                 // technically, there are some other cases there this might be resolved as range
                 // this might be good enough though
                 if (step == other_range->step) {
                     std::int32_t new_finish = std::max(finish, other_range->finish);
                     if (new_start < new_finish) {
-                        return std::shared_ptr<manifest_param>(
-                                new manifest_range_param(new_start, new_finish, step));
+                        return std::shared_ptr<manifest_param>(new manifest_range_param(new_start, new_finish, step));
                     } else {
                         return std::shared_ptr<manifest_param>(new manifest_single_value_param(new_start));
                     }
                 } else if (new_start >= other_range->finish) {
                     return std::shared_ptr<manifest_param>(new manifest_range_param(start, finish, step));
                 } else if (new_start >= finish) {
-                    return std::shared_ptr<manifest_param>(new manifest_range_param(other_range->start, other_range->finish, other_range->step));
+                    return std::shared_ptr<manifest_param>(
+                        new manifest_range_param(other_range->start, other_range->finish, other_range->step));
                 }
                 std::set<std::uint32_t> new_set = {std::uint32_t(new_start)};
                 for (auto value : *this) {
@@ -705,14 +698,13 @@ namespace nil {
             return std::shared_ptr<manifest_param>(new manifest_unsat_param());
         }
 
-        std::shared_ptr<manifest_param> manifest_range_param::intersect(
-                            std::shared_ptr<manifest_param> other) {
+        inline std::shared_ptr<manifest_param> manifest_range_param::intersect(std::shared_ptr<manifest_param> other) {
             using type = manifest_param::type;
             type other_type = get_manifest_param_type(other);
             if (other_type == type::UNSAT) {
                 return std::shared_ptr<manifest_param>(new manifest_unsat_param());
             } else if (other_type == type::SINGLE_VALUE) {
-                if (check_manifest_param(dynamic_cast<manifest_single_value_param*>(other.get())->value)) {
+                if (check_manifest_param(dynamic_cast<manifest_single_value_param *>(other.get())->value)) {
                     return other;
                 } else {
                     return std::shared_ptr<manifest_param>(new manifest_unsat_param());
@@ -721,7 +713,7 @@ namespace nil {
                 if (!is_satisfiable() || !other->is_satisfiable()) {
                     return std::shared_ptr<manifest_param>(new manifest_unsat_param());
                 }
-                manifest_range_param* other_range = dynamic_cast<manifest_range_param*>(other.get());
+                manifest_range_param *other_range = dynamic_cast<manifest_range_param *>(other.get());
                 std::int32_t other_start = other_range->start;
                 std::int32_t other_finish = other_range->finish;
                 std::uint32_t other_step = other_range->step;
@@ -731,15 +723,14 @@ namespace nil {
                     new_finish = std::min(finish, other_finish);
                     new_step = step;
                 } else {
-                    auto [step_gcd, m, n] =
-                        boost::integer::extended_euclidean<std::int32_t>(step, other_step);
+                    auto [step_gcd, m, n] = boost::integer::extended_euclidean<std::int32_t>(step, other_step);
                     if (start % step_gcd != other_start % step_gcd) {
                         return std::shared_ptr<manifest_param>(new manifest_unsat_param());
                     }
                     new_step = step * (other_step / step_gcd);
                     std::int32_t modulo_new_step =
-                        (new_step + (other_start * int(step) * m + start * int(other_step) * n) /
-                                    step_gcd % new_step) % new_step;
+                        (new_step + (other_start * int(step) * m + start * int(other_step) * n) / step_gcd % new_step) %
+                        new_step;
                     new_start = std::max(start, other_start);
                     new_start = new_start + (new_step + int(modulo_new_step - new_start) % new_step) % new_step;
                     new_finish = std::min(finish, other_finish);
@@ -753,7 +744,7 @@ namespace nil {
                 }
             } else if (other_type == type::SET) {
                 std::set<std::uint32_t> new_set;
-                manifest_set_param* other_set = dynamic_cast<manifest_set_param*>(other.get());
+                manifest_set_param *other_set = dynamic_cast<manifest_set_param *>(other.get());
                 for (std::uint32_t value : other_set->set) {
                     if (check_manifest_param(value)) {
                         new_set.insert(value);
@@ -766,7 +757,7 @@ namespace nil {
             return std::shared_ptr<manifest_param>(new manifest_unsat_param());
         }
 
-        std::shared_ptr<manifest_param> manifest_range_param::subtract(std::set<std::uint32_t> values) {
+        inline std::shared_ptr<manifest_param> manifest_range_param::subtract(std::set<std::uint32_t> values) {
             std::set<std::uint32_t> filtered_set;
             for (std::uint32_t value : values) {
                 if (check_manifest_param(value)) {
@@ -839,14 +830,13 @@ namespace nil {
             }
         }
 
-        std::shared_ptr<manifest_param> manifest_set_param::intersect(
-                            std::shared_ptr<manifest_param> other) {
+        inline std::shared_ptr<manifest_param> manifest_set_param::intersect(std::shared_ptr<manifest_param> other) {
             using type = manifest_param::type;
             type other_type = get_manifest_param_type(other);
             if (other_type == type::UNSAT) {
                 return std::shared_ptr<manifest_param>(new manifest_unsat_param());
             } else if (other_type == type::SINGLE_VALUE) {
-                if (check_manifest_param(dynamic_cast<manifest_single_value_param*>(other.get())->value)) {
+                if (check_manifest_param(dynamic_cast<manifest_single_value_param *>(other.get())->value)) {
                     return other;
                 } else {
                     return std::shared_ptr<manifest_param>(new manifest_unsat_param());
@@ -865,7 +855,7 @@ namespace nil {
                 }
             } else if (other_type == type::SET) {
                 std::set<std::uint32_t> new_set;
-                manifest_set_param* other_set = dynamic_cast<manifest_set_param*>(other.get());
+                manifest_set_param *other_set = dynamic_cast<manifest_set_param *>(other.get());
                 for (std::uint32_t value : other_set->set) {
                     if (check_manifest_param(value)) {
                         new_set.insert(value);
@@ -903,23 +893,20 @@ namespace nil {
             param_ptr_type lookup_column_amount;
             lookup_size_func_type lookup_size_for_column_amount;
 
-            plonk_component_manifest(param_ptr_type witness_params, manifest_constant_type constant_required)
-                : witness_amount(witness_params),
-                  constant_required(constant_required),
-                  lookup_usage(manifest_lookup_type::type::NONE),
-                  lookup_column_amount(param_ptr_type(new manifest_single_value_param(0))),
-                  lookup_size_for_column_amount(empty_lookup_size_for_column_amount) {}
+            plonk_component_manifest(param_ptr_type witness_params, manifest_constant_type constant_required) :
+                witness_amount(witness_params), constant_required(constant_required),
+                lookup_usage(manifest_lookup_type::type::NONE),
+                lookup_column_amount(param_ptr_type(new manifest_single_value_param(0))),
+                lookup_size_for_column_amount(empty_lookup_size_for_column_amount) {
+            }
 
             plonk_component_manifest(param_ptr_type witness_params, manifest_constant_type constant_required,
-                                     manifest_lookup_type lookup_usage,
-                                     param_ptr_type lookup_column_amount,
-                                     const lookup_size_func_type
-                                        &lookup_size_for_column_amount)
-                : witness_amount(witness_params),
-                    constant_required(constant_required),
-                    lookup_usage(lookup_usage),
-                    lookup_column_amount(lookup_column_amount),
-                    lookup_size_for_column_amount(lookup_size_for_column_amount) {}
+                                     manifest_lookup_type lookup_usage, param_ptr_type lookup_column_amount,
+                                     const lookup_size_func_type &lookup_size_for_column_amount) :
+                witness_amount(witness_params), constant_required(constant_required), lookup_usage(lookup_usage),
+                lookup_column_amount(lookup_column_amount),
+                lookup_size_for_column_amount(lookup_size_for_column_amount) {
+            }
 
             plonk_component_manifest(const plonk_component_manifest &other) {
                 witness_amount = other.witness_amount;
@@ -932,8 +919,7 @@ namespace nil {
             // Checks if the manifest would be satisfied for passed params.
             bool check_manifest(std::uint32_t witness_amount, std::uint32_t constant_amount,
                                 std::uint32_t lookup_column_amount,
-                                const std::vector<std::uint32_t> &lookup_size_for_column,
-                                bool strict = false) const {
+                                const std::vector<std::uint32_t> &lookup_size_for_column, bool strict = false) const {
                 if (!this->witness_amount->check_manifest_param(witness_amount, strict)) {
                     return false;
                 }
@@ -964,9 +950,8 @@ namespace nil {
             // Checks if the manifest is satisfied for the component.
             // This is a runtime check in order to prevent bad intialization of components.
             template<typename BlueprintFieldType>
-            bool check_manifest(
-                const nil::blueprint::components::plonk_component<BlueprintFieldType>
-                    &component) const {
+            bool
+                check_manifest(const nil::blueprint::components::plonk_component<BlueprintFieldType> &component) const {
                 // TODO: add lookups when they arrive.
                 return check_manifest(component.witness_amount(), component.constant_amount(), 0, {});
             }
@@ -1000,29 +985,25 @@ namespace nil {
                     new_lookup_size_for_column_amount = empty_lookup_size_for_column_amount;
                 }
 
-                return plonk_component_manifest(
-                    witness_amount->merge_with(other.witness_amount),
-                    constant_required.merge_with(other.constant_required),
-                    new_lookup_usage,
-                    new_lookup_column_amount,
-                    new_lookup_size_for_column_amount
-                );
+                return plonk_component_manifest(witness_amount->merge_with(other.witness_amount),
+                                                constant_required.merge_with(other.constant_required),
+                                                new_lookup_usage,
+                                                new_lookup_column_amount,
+                                                new_lookup_size_for_column_amount);
             }
 
             // Checks if there is at least a single set of parameters which satisfies this manifest
             bool is_satisfiable() const {
-                return witness_amount->is_satisfiable() &&
-                       constant_required != manifest_constant_type::type::UNSAT &&
-                       lookup_usage != manifest_lookup_type::type::UNSAT &&
-                       lookup_column_amount->is_satisfiable();
+                return witness_amount->is_satisfiable() && constant_required != manifest_constant_type::type::UNSAT &&
+                       lookup_usage != manifest_lookup_type::type::UNSAT && lookup_column_amount->is_satisfiable();
             }
         };
 
-        std::ostream& operator<<(std::ostream& os, const plonk_component_manifest &manifest) {
+        inline std::ostream &operator<<(std::ostream &os, const plonk_component_manifest &manifest) {
             os << "witness_amount: " << (*manifest.witness_amount) << " "
-                << "constant_required: " << manifest.constant_required << " "
-                << "lookup_usage: " << manifest.lookup_usage << " "
-                << "lookup_column_amount: " << (*manifest.lookup_column_amount);
+               << "constant_required: " << manifest.constant_required << " "
+               << "lookup_usage: " << manifest.lookup_usage << " "
+               << "lookup_column_amount: " << (*manifest.lookup_column_amount);
             if (manifest.lookup_usage == manifest_lookup_type::type::REQUIRED ||
                 manifest.lookup_usage == manifest_lookup_type::type::OPTIONAL) {
 
@@ -1095,9 +1076,8 @@ namespace nil {
 
             // Generates a new component manifest based on intersection with given compiler manifest.
             plonk_component_manifest intersect(const plonk_component_manifest &component_manifest) const {
-                manifest_lookup_type compiler_lookup_usage = max_lookup_columns > 0
-                                                                  ? manifest_lookup_type::type::OPTIONAL
-                                                                  : manifest_lookup_type::type::NONE;
+                manifest_lookup_type compiler_lookup_usage =
+                    max_lookup_columns > 0 ? manifest_lookup_type::type::OPTIONAL : manifest_lookup_type::type::NONE;
                 manifest_lookup_type new_lookup_usage =
                     component_manifest.lookup_usage.intersect(compiler_lookup_usage);
                 plonk_component_manifest::lookup_size_func_type new_lookup_size_for_column_amount =
@@ -1124,20 +1104,17 @@ namespace nil {
                     }
                 }
 
-                return plonk_component_manifest(
-                    component_manifest.witness_amount->intersect(witness_amount),
-                    component_manifest.constant_required.intersect(*this),
-                    new_lookup_usage,
-                    new_lookup_column_amount,
-                    new_lookup_size_for_column_amount
-                );
+                return plonk_component_manifest(component_manifest.witness_amount->intersect(witness_amount),
+                                                component_manifest.constant_required.intersect(*this),
+                                                new_lookup_usage,
+                                                new_lookup_column_amount,
+                                                new_lookup_size_for_column_amount);
             }
         };
 
-        manifest_constant_type manifest_constant_type::intersect(
-                const compiler_manifest &manifest) const {
+        inline manifest_constant_type manifest_constant_type::intersect(const compiler_manifest &manifest) const {
             if (t == manifest_constant_type::type::UNSAT ||
-               (t == manifest_constant_type::type::REQUIRED && manifest.has_constant == false)) {
+                (t == manifest_constant_type::type::REQUIRED && manifest.has_constant == false)) {
                 return manifest_constant_type::type::UNSAT;
             } else if (t == manifest_constant_type::type::REQUIRED && manifest.has_constant == true) {
                 return manifest_constant_type::type::REQUIRED;
@@ -1164,10 +1141,10 @@ namespace nil {
         public:
             bool operator()(const std::shared_ptr<component_gate_manifest> &a,
                             const std::shared_ptr<component_gate_manifest> &b) const {
-                #pragma clang diagnostic push
-                #pragma clang diagnostic ignored "-Wpotentially-evaluated-expression"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpotentially-evaluated-expression"
                 if (typeid(*(a.get())) != typeid(*(b.get()))) {
-                #pragma clang diagnostic pop
+#pragma clang diagnostic pop
                     return a.get() < b.get();
                 } else {
                     return a->operator<(b.get());
@@ -1195,7 +1172,8 @@ namespace nil {
             std::set<std::shared_ptr<component_gate_manifest>, component_gate_manifest_comparison>
                 component_gate_manifests = {};
 
-            gate_manifest() : gates_amount(0) {}
+            gate_manifest() : gates_amount(0) {
+            }
             gate_manifest(const gate_manifest &other) : gates_amount(other.gates_amount) {
                 component_gate_manifests = other.component_gate_manifests;
             }
@@ -1205,7 +1183,7 @@ namespace nil {
             }
 
             template<typename GateManifestType>
-            gate_manifest& add(const GateManifestType &gate) {
+            gate_manifest &add(const GateManifestType &gate) {
                 component_gate_manifests.insert(std::make_shared<GateManifestType>(gate));
                 calc_gates_amount();
                 return *this;
@@ -1215,14 +1193,14 @@ namespace nil {
                 return gates_amount;
             }
 
-            gate_manifest& merge_with(const gate_manifest &other) {
+            gate_manifest &merge_with(const gate_manifest &other) {
                 component_gate_manifests.insert(other.component_gate_manifests.begin(),
                                                 other.component_gate_manifests.end());
                 calc_gates_amount();
                 return *this;
             }
         };
-    }       // namespace blueprint
+    }    // namespace blueprint
 }    // namespace nil
 
-#endif // CRYPTO3_BLUEPRINT_COMPONENT_MANIFEST_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENT_MANIFEST_HPP
