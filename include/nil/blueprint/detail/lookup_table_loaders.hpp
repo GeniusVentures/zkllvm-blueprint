@@ -22,101 +22,35 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#include <optional>
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#pragma once
 
 #include <nil/blueprint/detail/lookup_table_precomputes.hpp>
-
-#include <boost/spirit/include/qi.hpp>
-#include <boost/phoenix.hpp>
 
 namespace nil {
     namespace blueprint {
         namespace components {
             namespace detail {
 
-                template<typename Iterator, typename BlueprintFieldType>
-                struct value_vector_parser : boost::spirit::qi::grammar<Iterator,
-                        std::vector<typename BlueprintFieldType::value_type>(),
-                        boost::spirit::qi::ascii::space_type> {
-                    using value_type = typename BlueprintFieldType::value_type;
-                    using integral_type = typename BlueprintFieldType::integral_type;
-                    using return_type = std::vector<value_type>;
+                template<typename BluePrintFieldType, std::size_t N>
+                void parse_lookup_table(
+                    const std::array<std::array<uint32_t, 2>, N>& arr,
+                    std::vector<std::vector<typename BluePrintFieldType::value_type>>& result
+                ) {
+                    using value_type = typename BluePrintFieldType::value_type;
 
-                    value_vector_parser(std::size_t size) : value_vector_parser::base_type(start) {
-                        using boost::spirit::qi::uint_parser;
-                        using boost::spirit::qi::_val;
-                        using boost::spirit::qi::_1;
-                        using boost::spirit::qi::_2;
-                        using boost::spirit::qi::repeat;
-                        using boost::phoenix::construct;
-                        using boost::phoenix::val;
-                        auto number = uint_parser<integral_type, 16, 1,
-                                                  (BlueprintFieldType::modulus_bits + 16 - 1) / 16>();
-                        start = repeat(size)[number];
+                    result.resize(2);
 
-                        boost::spirit::qi::on_error<boost::spirit::qi::fail>(
-                            start,
-                            std::cerr << val("Error! Expecting ") << boost::spirit::qi::_4 << val(" here: \"")
-                                      << construct<std::string>(boost::spirit::_3, boost::spirit::_2) << val("\"\n")
-                        );
+                    for (auto& column: result) {
+                        column.resize(N);
                     }
 
-                    boost::spirit::qi::rule<Iterator, return_type(), boost::spirit::qi::ascii::space_type> start;
-                };
+                    for (std::size_t i = 0; i < N; ++i) {
+                        value_type first(arr[i][0]);
+                        value_type second(arr[i][1]);
 
-                template <typename BlueprintFieldType>
-                bool parse_lookup_table(
-                        std::istream &ist,
-                        const std::size_t line_size,
-                        std::vector<std::vector<typename BlueprintFieldType::value_type>> &result) {
-                    using value_type = typename BlueprintFieldType::value_type;
-                    std::string line;
-                    // Get the table size
-                    std::getline(ist, line);
-                    std::size_t table_size = std::stoull(line);
-                    result.resize(line_size);
-                    for (auto &column : result) {
-                        column.resize(table_size);
+                        result[0][i] = std::move(first);
+                        result[1][i] = std::move(second);
                     }
-                    for (std::size_t i = 0; i < table_size; i++) {
-                        std::getline(ist, line);
-                        std::vector<value_type> row;
-                        value_vector_parser<decltype(line.begin()), BlueprintFieldType> parser(line_size);
-                        boost::spirit::qi::ascii::space_type space;
-                        bool parsing_result =
-                            boost::spirit::qi::phrase_parse(line.begin(), line.end(), parser, space, row);
-                        if (!parsing_result) {
-                            return false;
-                        }
-                        for (std::size_t j = 0; j < line_size; j++) {
-                            result[j][i] = row[j];
-                        }
-                    }
-                    return true;
-                }
-
-                // Loads the table from file, trying multiple different filen paths if one fails
-                template <typename BlueprintFieldType>
-                bool load_lookup_table(
-                        const std::set<std::string> &candidate_file_paths,
-                        const std::size_t line_size,
-                        std::vector<std::vector<typename BlueprintFieldType::value_type>> &result) {
-
-                    for (const auto &path : candidate_file_paths) {
-                        // try opening the file
-                        std::ifstream file(path);
-                        if (!file.is_open()) {
-                            continue;
-                        }
-                        auto status = parse_lookup_table<BlueprintFieldType>(file, line_size, result);
-                        if (status) {
-                            return true;
-                        }
-                    }
-                    return false;
                 }
 
                 // This forcefully includes the table in the binary
@@ -128,13 +62,11 @@ namespace nil {
                     std::vector<std::vector<typename BlueprintFieldType::value_type>> &result) {
 
                     if (table_name == "8_split_4") {
-                        const std::string table_data = _8_SPLIT_4;
-                        std::stringstream ss(table_data);
-                        return parse_lookup_table<BlueprintFieldType>(ss, 2, result);
+                        parse_lookup_table<BlueprintFieldType>(table_8_split_4, result);
+                        return true;
                     } else if (table_name == "8_split_7") {
-                        const std::string table_data = _8_SPLIT_7;
-                        std::stringstream ss(table_data);
-                        return parse_lookup_table<BlueprintFieldType>(ss, 2, result);
+                        parse_lookup_table<BlueprintFieldType>(table_8_split_7, result);
+                        return true;
                     } else {
                         return false;
                     }
