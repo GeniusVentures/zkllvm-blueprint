@@ -148,7 +148,11 @@ namespace nil {
                     case var::column_type::selector:
                         BOOST_ASSERT_MSG(false, "Public input/selectors should not be in a gate.");
                 }
+                #if defined(_MSC_VER) && !defined(__clang__)
+                __assume(false);
+                #else
                 __builtin_unreachable();
+                #endif
             };
 
             value_type get_first_value(const var &var) {

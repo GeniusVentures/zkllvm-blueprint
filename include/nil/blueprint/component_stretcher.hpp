@@ -229,7 +229,11 @@ namespace nil {
                             case nil::crypto3::math::ArithmeticOperator::MULT:
                                 return left * right;
                             default:
+                                #if defined(_MSC_VER) && !defined(__clang__)
+                                __assume(false);
+                                #else
                                 __builtin_unreachable();
+                                #endif
                         }
                     }
                 private:
