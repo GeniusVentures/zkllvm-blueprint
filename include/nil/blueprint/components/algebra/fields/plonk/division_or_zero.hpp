@@ -107,10 +107,6 @@ namespace nil {
                         output = var(component.W(2), start_row_index, false, var::column_type::witness);
                     }
 
-                    result_type(const division_or_zero &component, std::size_t start_row_index) {
-                        output = var(component.W(2), start_row_index, false, var::column_type::witness);
-                    }
-
                     std::vector<var> all_vars() const {
                         return {output};
                     }
